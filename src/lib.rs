@@ -1,4 +1,4 @@
-#![no_std]
+//#![no_std]
 use xxhash_rust::xxh32::xxh32;
 
 pub struct MicroBloom<const M: usize, const K: u8> {
@@ -40,9 +40,10 @@ impl<const M: usize, const K: u8> MicroBloom<M, K> {
 mod tests {
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
+    use frand::Rand;
 
     #[test]
-    fn test_insert_1k() {
+    fn test_1k() {
         let mut bloom = MicroBloom::<256, 3>::new();
 
         for i in 0..1000u32 {
@@ -66,5 +67,35 @@ mod tests {
         }
         assert!(false_positive_found);
         assert!(negative_found);
+    }
+
+    #[test]
+    fn test_statistical() {
+        let mut bloom = MicroBloom::<256, 3>::new();
+        let mut rand = Rand::with_seed(0);
+
+        for _ in 0..3000u32 {
+            bloom.insert(rand.r#gen());
+        }
+        let mut false_positives: u32 = 0;
+        for _ in 0..1000u32 {
+            if bloom.check(rand.r#gen()) {
+                false_positives += 1;
+            }
+        }
+        let false_positives_percentage: f32 = false_positives as f32 / 1000.0;
+        assert!(0.27 < false_positives_percentage && false_positives_percentage < 0.31);
+
+        for _ in 0..13000u32 {
+            bloom.insert(rand.r#gen());
+        }
+        let mut false_positives: u32 = 0;
+        for _ in 0..1000u32 {
+            if bloom.check(rand.r#gen()) {
+                false_positives += 1;
+            }
+        }
+        let false_positives_percentage: f32 = false_positives as f32 / 1000.0;
+        assert!(0.97 < false_positives_percentage && false_positives_percentage < 1.00);
     }
 }

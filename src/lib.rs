@@ -1,4 +1,4 @@
-//#![no_std]
+#![no_std]
 use xxhash_rust::xxh32::xxh32;
 
 pub struct MicroBloom<const M: usize, const K: u8> {
@@ -69,6 +69,8 @@ mod tests {
         assert!(negative_found);
     }
 
+    // Test statistical characteristics of the Bloom filter.
+    // https://hur.st/bloomfilter/?n=3000&p=&m=8192&k=3 was used for theoretical estimations.
     #[test]
     fn test_statistical() {
         let mut bloom = MicroBloom::<256, 3>::new();

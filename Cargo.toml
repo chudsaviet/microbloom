@@ -4,5 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-frand = { version = "0.10.1", default-features = false }
 xxhash-rust = { version = "0.8.15", features = ["xxh32"] }
+
+[dev-dependencies]
+frand = { version = "0.10.1", default-features = false }
